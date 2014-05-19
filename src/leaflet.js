@@ -80,7 +80,6 @@
     leaflet._childLinks.push(this);
   };
 
-
   Leaflet.prototype.unlinkChild = function(leaflet) {
     pull(this._childLinks, leaflet);
     pull(leaflet._parentLinks, this);
@@ -89,6 +88,14 @@
   Leaflet.prototype.unlinkParent = function(leaflet) {
     pull(this._parentLinks, leaflet);
     pull(leaflet._childLinks, this);
+  };
+
+  // Static methods
+  Leaflet.mixin = function(obj) {
+    var leaflet = new Leaflet();
+
+    extend(obj, leaflet);
+    extend(obj, Leaflet.prototype);
   };
 
   var LeafletEvent = function(eventName, direction) {
@@ -152,6 +159,16 @@
     return function() {
       fn.apply(context, args.concat(toArray(arguments)));
     };
+  }
+
+  function extend(obj1, obj2) {
+    for (var key in obj2) {
+      if (obj2.hasOwnProperty(key)) {
+        obj1[key] = obj2[key];
+      }
+    }
+
+    return obj1;
   }
 
   function toArray(collection, start) {

@@ -178,4 +178,58 @@ describe("Leaflet", function() {
     expect(parentspy).toHaveBeenCalled();
     expect(childspy).not.toHaveBeenCalled();
   });
+
+  it("should mixin the event emitter", function() {
+    var leaflet1 = {};
+    var leaflet2 = {};
+
+    var spy1 = jasmine.createSpy();
+    var spy2 = jasmine.createSpy();
+
+    Leaflet.mixin(leaflet1);
+    Leaflet.mixin(leaflet2);
+
+    leaflet1.on("test", spy1);
+    leaflet2.on("test", spy2);
+
+    leaflet1.emit("test");
+    leaflet2.emit("test");
+
+    expect(spy1.calls.count()).toBe(1);
+    expect(spy2.calls.count()).toBe(1);
+  });
+
+  it("should unlink a parent", function() {
+    var parent = new Leaflet();
+    var child = new Leaflet();
+
+    child.linkParent(parent);
+
+    expect(child._parentLinks[0]).toBe(parent);
+    expect(parent._childLinks[0]).toBe(child);
+
+    child.unlinkParent(parent);
+
+    expect(child._parentLinks[0]).toBeUndefined();
+    expect(parent._childLinks[0]).toBeUndefined();
+    expect(child._parentLinks.length).toBe(0);
+    expect(parent._childLinks.length).toBe(0);
+  });
+
+  it("should unlink a child", function() {
+    var parent = new Leaflet();
+    var child = new Leaflet();
+
+    parent.linkChild(child);
+
+    expect(child._parentLinks[0]).toBe(parent);
+    expect(parent._childLinks[0]).toBe(child);
+
+    parent.unlinkChild(child);
+
+    expect(child._parentLinks[0]).toBeUndefined();
+    expect(parent._childLinks[0]).toBeUndefined();
+    expect(child._parentLinks.length).toBe(0);
+    expect(parent._childLinks.length).toBe(0);
+  });
 });
