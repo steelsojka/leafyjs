@@ -8,6 +8,11 @@
   var DOWN = "down";
   var FLAT = "flat";
 
+  var methodTypes = {
+    up: "emitUp",
+    down: "emitDown"
+  };
+
   var Leaflet = function() {
     this._childLinks = [];
     this._parentLinks = [];
@@ -29,10 +34,8 @@
       return;
     }
 
-    var index = indexOf.call(this._listeners[event], fn);
-
-    if (fn && index !== -1) {
-      this._listeners[event].splice(index, 1);
+    if (fn) {
+      pull(this._listeners[event], fn);
 
       if (this._listeners[event].length < 1) {
         delete this._listeners[event];
@@ -44,7 +47,7 @@
 
   Leaflet.prototype.emit = function(eventName) {
     var event = eventName instanceof LeafletEvent ? eventName : new LeafletEvent(eventName, FLAT);
-    var args = slice.call(arguments, 0);
+    var args = toArray(arguments);
 
     eventName = event.getEventName();
 
@@ -59,56 +62,12 @@
     }
   };
 
-  Leaflet.prototype.emitUp = function(eventName) {
-    var event = eventName instanceof LeafletEvent ? eventName : new LeafletEvent(eventName, UP);
-    var args = slice.call(arguments, 0);
-
-    eventName = event.getEventName();
-
-    args[0] = event;
-
-    for (var i = 0, len = this._parentLinks.length; i < len; i++) {
-      var node = this._parentLinks[i];
-
-      if (node._listeners[eventName]) {
-        for (var y = 0, len2 = node._listeners[eventName].length; y < len2; y++) {
-          node._listeners[eventName][y].apply(node, args);
-        }
-      }
-    }
-
-    // If propagation was not stopped, it's safe to move to the next level
-    if (!event.isPropagationStopped()) {
-      for (i = 0, len = this._parentLinks.length; i < len; i++) {
-        this._parentLinks[i].emitUp.apply(this._parentLinks[i], args);
-      }
-    }
+  Leaflet.prototype.emitUp = function() {
+    emit(UP, this._parentLinks, toArray(arguments));
   };
 
-  Leaflet.prototype.emitDown = function(eventName) {
-    var event = eventName instanceof LeafletEvent ? eventName : new LeafletEvent(eventName, DOWN);
-    var args = slice.call(arguments, 0);
-
-    eventName = event.getEventName();
-
-    args[0] = event;
-
-    for (var i = 0, len = this._childLinks.length; i < len; i++) {
-      var node = this._childLinks[i];
-
-      if (node._listeners[eventName]) {
-        for (var y = 0, len2 = node._listeners[eventName].length; y < len2; y++) {
-          node._listeners[eventName][y].apply(node, args);
-        }
-      }
-    }
-
-    // If propagation was not stopped, it's safe to move to the next level
-    if (!event.isPropagationStopped()) {
-      for (i = 0, len = this._childLinks.length; i < len; i++) {
-        this._childLinks[i].emitDown.apply(this._childLinks[i], args);
-      }
-    }
+  Leaflet.prototype.emitDown = function() {
+    emit(DOWN, this._childLinks, toArray(arguments));
   };
 
   Leaflet.prototype.linkChild = function(leaflet) {
@@ -119,6 +78,17 @@
   Leaflet.prototype.linkParent = function(leaflet) {
     this._parentLinks.push(leaflet);
     leaflet._childLinks.push(this);
+  };
+
+
+  Leaflet.prototype.unlinkChild = function(leaflet) {
+    pull(this._childLinks, leaflet);
+    pull(leaflet._parentLinks, this);
+  };
+
+  Leaflet.prototype.unlinkParent = function(leaflet) {
+    pull(this._parentLinks, leaflet);
+    pull(leaflet._childLinks, this);
   };
 
   var LeafletEvent = function(eventName, direction) {
@@ -141,23 +111,62 @@
     };
   };
 
+  function emit(type, collection, args) {
+    var eventName = args[0];
+    var event = eventName instanceof LeafletEvent ? eventName : new LeafletEvent(eventName, type);
+    var method = methodTypes[type];
+
+    eventName = event.getEventName();
+
+    args[0] = event;
+
+    for (var i = 0, len = collection.length; i < len; i++) {
+      var node = collection[i];
+
+      if (node._listeners[eventName]) {
+        for (var y = 0, len2 = node._listeners[eventName].length; y < len2; y++) {
+          node._listeners[eventName][y].apply(node, args);
+        }
+      }
+    }
+
+    // If propagation was not stopped, it's safe to move to the next level
+    if (!event.isPropagationStopped()) {
+      for (i = 0, len = collection.length; i < len; i++) {
+        collection[i][method].apply(collection[i], args);
+      }
+    }
+  }
+
+  function pull(collection, item) {
+    var index = indexOf(collection, item);
+
+    if (index !== -1) {
+      collection.splice(index, 1);
+    }
+  }
+
   function bind(context, fn) {
-    var args = slice.call(arguments, 2);
+    var args = toArray(arguments, 2);
 
     return function() {
-      fn.apply(context, args.concat(slice.call(arguments, 0)));
+      fn.apply(context, args.concat(toArray(arguments)));
     };
   }
 
-  var indexOf = arrayProto.indexOf || function(element) {
-    for (var i = 0, len = this.length; i < len; i++) {
-      if (this[i] === element) {
+  function toArray(collection, start) {
+    return slice.call(collection, (start || 0));
+  }
+
+  function indexOf(collection, element) {
+    for (var i = 0, len = collection.length; i < len; i++) {
+      if (collection[i] === element) {
         return i;
       }
     }
 
     return -1;
-  };
+  }
 
   exports.Leaflet = Leaflet;
 }(this));
