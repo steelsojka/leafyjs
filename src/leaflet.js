@@ -136,7 +136,7 @@
 
     eventName = event.getEventName();
 
-    event.transformValues(args.slice(1));
+    event.transformValues.apply(event, args.slice(1));
 
     args[0] = event;
 
