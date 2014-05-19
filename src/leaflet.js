@@ -73,11 +73,13 @@
   Leaflet.prototype.linkChild = function(leaflet) {
     this._childLinks.push(leaflet);
     leaflet._parentLinks.push(this);
+    return leaflet;
   };
 
   Leaflet.prototype.linkParent = function(leaflet) {
     this._parentLinks.push(leaflet);
     leaflet._childLinks.push(this);
+    return leaflet;
   };
 
   Leaflet.prototype.unlinkChild = function(leaflet) {
@@ -100,6 +102,7 @@
 
   var LeafletEvent = function(eventName, direction) {
     var stopProp = false;
+    var values = [];
 
     this.isPropagationStopped = function() {
       return stopProp;
@@ -116,6 +119,14 @@
     this.getEventName = function() {
       return eventName;
     };
+
+    this.transformValues = function() {
+      values = toArray(arguments);
+    };
+
+    this.getValues = function() {
+      return values;
+    };
   };
 
   function emit(type, collection, args) {
@@ -124,6 +135,8 @@
     var method = methodTypes[type];
 
     eventName = event.getEventName();
+
+    event.transformValues(args.slice(1));
 
     args[0] = event;
 
@@ -139,6 +152,10 @@
 
     // If propagation was not stopped, it's safe to move to the next level
     if (!event.isPropagationStopped()) {
+      // If the values get transformed we create a new set of arguments.
+      // Transformed arguments only get passed to the next level and not siblings
+      args = [event].concat(event.getValues());
+
       for (i = 0, len = collection.length; i < len; i++) {
         collection[i][method].apply(collection[i], args);
       }

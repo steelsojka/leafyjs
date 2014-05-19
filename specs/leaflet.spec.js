@@ -137,6 +137,15 @@ describe("Leaflet", function() {
     expect(grandparentspy).not.toHaveBeenCalled();
   });
 
+  it("should chain link leaflets", function() {
+    var grandparent = new Leaflet();
+    var parent = new Leaflet();
+    var child = new Leaflet();
+
+    expect(grandparent.linkChild(parent)).toBe(parent)
+    expect(child.linkParent(parent)).toBe(parent)
+  });
+
   it("should emit events down through a heirarchy chain", function() {
     var grandparent = new Leaflet();
     var parent = new Leaflet();
@@ -231,5 +240,29 @@ describe("Leaflet", function() {
     expect(parent._childLinks[0]).toBeUndefined();
     expect(child._parentLinks.length).toBe(0);
     expect(parent._childLinks.length).toBe(0);
+  });
+
+  it("should transform the values from child to parent", function() {
+    var parent = new Leaflet();
+    var child = new Leaflet();
+    var grandparent = new Leaflet();
+
+    grandparent.linkChild(parent).linkChild(child);
+
+    grandparent.on("test", function(event, value, word) {
+      expect(value).toBe(15);
+      expect(word).toBe("hello world");
+    });
+
+    parent.on("test", function(event, value, word) {
+      event.transformValues(value + 10, word + " world");
+    });
+
+    parent.on("test", function(event, value, word) {
+      expect(value).toBe(5);
+      expect(word).toBe("hello");
+    });
+
+    child.emitUp("test", 5, "hello");
   });
 });
