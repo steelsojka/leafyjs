@@ -14,90 +14,102 @@
   };
 
   var Leaflet = function() {
-    this._childLinks = [];
-    this._parentLinks = [];
-    this._listeners = {};
-  };
-  
-  Leaflet.prototype.on = function(event, callback) {
-    this._listeners[event] = this._listeners[event] || [];
+    // These variables have to be "private" to avoid having circular references.
+    var childLinks = [];
+    var parentLinks = [];
+    var listeners = {};
 
-    this._listeners[event].push(callback);
+    this.getListeners = function() {
+      return listeners;
+    };
 
-    return bind(this, function() {
-      this.off(event, callback);
-    });
-  };
+    this.getParentLinks = function() {
+      return parentLinks;
+    };
 
-  Leaflet.prototype.off = function(event, fn) {
-    if (!this._listeners[event]) {
-      return;
-    }
+    this.getChildLinks = function() {
+      return childLinks;
+    };
 
-    if (fn) {
-      pull(this._listeners[event], fn);
+    this.on = function(event, callback) {
+      listeners[event] = listeners[event] || [];
 
-      if (this._listeners[event].length < 1) {
-        delete this._listeners[event];
+      listeners[event].push(callback);
+
+      return bind(this, function() {
+        this.off(event, callback);
+      });
+    };
+
+    this.off = function(event, fn) {
+      if (!listeners[event]) {
+        return;
       }
-    } else {
-      delete this._listeners[event];
-    }
-  };
 
-  Leaflet.prototype.emit = function(eventName) {
-    var event = eventName instanceof LeafletEvent ? eventName : new LeafletEvent(eventName, FLAT);
-    var args = toArray(arguments);
+      if (fn) {
+        pull(listeners[event], fn);
 
-    eventName = event.getEventName();
+        if (listeners[event].length < 1) {
+          delete listeners[event];
+        }
+      } else {
+        delete listeners[event];
+      }
+    };
 
-    args[0] = event;
+    this.emit = function(eventName) {
+      var event = eventName instanceof LeafletEvent ? eventName : new LeafletEvent(eventName, FLAT);
+      var args = toArray(arguments);
 
-    if (!this._listeners[eventName]) {
-      return;
-    }
+      eventName = event.getEventName();
 
-    for (var i = 0, len = this._listeners[eventName].length; i < len; i++) {
-      this._listeners[eventName][i].apply(this, args);
-    }
-  };
+      args[0] = event;
 
-  Leaflet.prototype.emitUp = function() {
-    emit(UP, this._parentLinks, toArray(arguments));
-  };
+      if (!listeners[eventName]) {
+        return;
+      }
 
-  Leaflet.prototype.emitDown = function() {
-    emit(DOWN, this._childLinks, toArray(arguments));
-  };
+      for (var i = 0, len = listeners[eventName].length; i < len; i++) {
+        listeners[eventName][i].apply(this, args);
+      }
+    };
 
-  Leaflet.prototype.linkChild = function(leaflet) {
-    this._childLinks.push(leaflet);
-    leaflet._parentLinks.push(this);
-    return leaflet;
-  };
+    this.emitUp = function() {
+      emit(UP, parentLinks, toArray(arguments));
+    };
 
-  Leaflet.prototype.linkParent = function(leaflet) {
-    this._parentLinks.push(leaflet);
-    leaflet._childLinks.push(this);
-    return leaflet;
-  };
+    this.emitDown = function() {
+      emit(DOWN, childLinks, toArray(arguments));
+    };
 
-  Leaflet.prototype.unlinkChild = function(leaflet) {
-    pull(this._childLinks, leaflet);
-    pull(leaflet._parentLinks, this);
-  };
+    this.linkChild = function(leaflet) {
+      childLinks.push(leaflet);
+      leaflet.getParentLinks().push(this);
+      return leaflet;
+    };
 
-  Leaflet.prototype.unlinkParent = function(leaflet) {
-    pull(this._parentLinks, leaflet);
-    pull(leaflet._childLinks, this);
+    this.linkParent = function(leaflet) {
+      parentLinks.push(leaflet);
+      leaflet.getChildLinks().push(this);
+      return leaflet;
+    };
+
+    this.unlinkChild = function(leaflet) {
+      pull(childLinks, leaflet);
+      pull(leaflet.getParentLinks(), this);
+      return leaflet;
+    };
+
+    this.unlinkParent = function(leaflet) {
+      pull(parentLinks, leaflet);
+      pull(leaflet.getChildLinks(), this);
+      return leaflet;
+    };
   };
 
   // Static methods
   Leaflet.mixin = function(obj) {
-    var leaflet = new Leaflet();
-
-    extend(obj, leaflet);
-    extend(obj, Leaflet.prototype);
+    extend(obj, new Leaflet());
   };
 
   var LeafletEvent = function(eventName, direction) {
@@ -142,10 +154,11 @@
 
     for (var i = 0, len = collection.length; i < len; i++) {
       var node = collection[i];
+      var listeners = node.getListeners();
 
-      if (node._listeners[eventName]) {
-        for (var y = 0, len2 = node._listeners[eventName].length; y < len2; y++) {
-          node._listeners[eventName][y].apply(node, args);
+      if (listeners[eventName]) {
+        for (var y = 0, len2 = listeners[eventName].length; y < len2; y++) {
+          listeners[eventName][y].apply(node, args);
         }
       }
     }

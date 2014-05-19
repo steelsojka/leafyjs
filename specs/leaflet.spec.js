@@ -6,9 +6,7 @@ describe("Leaflet", function() {
   it("should create a new instance", function() {
     var leaflet = new Leaflet();
 
-    expect(leaflet._listeners).toBeDefined();
-    expect(leaflet._parentLinks).toBeDefined();
-    expect(leaflet._childLinks).toBeDefined();
+    expect(leaflet instanceof Leaflet).toBe(true);
   });
 
   it("should bind an event", function() {
@@ -16,8 +14,10 @@ describe("Leaflet", function() {
 
     leaflet.on("test", function() {});
 
-    expect(leaflet._listeners["test"]).toBeDefined();
-    expect(leaflet._listeners["test"].length).toBe(1);
+    var listeners = leaflet.getListeners();
+
+    expect(listeners["test"]).toBeDefined();
+    expect(listeners["test"].length).toBe(1);
   });
 
   it("should emit an event", function() {
@@ -35,24 +35,25 @@ describe("Leaflet", function() {
     var leaflet = new Leaflet();
 
     var unbind = leaflet.on("test", function() {});
+    var listeners = leaflet.getListeners();
 
-    expect(leaflet._listeners["test"]).toBeDefined();
-    expect(leaflet._listeners["test"].length).toBe(1);
+    expect(listeners["test"]).toBeDefined();
+    expect(listeners["test"].length).toBe(1);
 
     unbind();
 
-    expect(leaflet._listeners["test"]).toBeUndefined();
+    expect(listeners["test"]).toBeUndefined();
 
     var callback = function() {};
 
     leaflet.on("test", callback);
 
-    expect(leaflet._listeners["test"]).toBeDefined();
-    expect(leaflet._listeners["test"].length).toBe(1);
+    expect(listeners["test"]).toBeDefined();
+    expect(listeners["test"].length).toBe(1);
 
     leaflet.off("test", callback);
 
-    expect(leaflet._listeners["test"]).toBeUndefined();
+    expect(listeners["test"]).toBeUndefined();
   });
 
   it("should unbind all event listeners", function() {
@@ -61,12 +62,14 @@ describe("Leaflet", function() {
     leaflet.on("test", function() {});
     leaflet.on("test", function() {});
 
-    expect(leaflet._listeners["test"]).toBeDefined();
-    expect(leaflet._listeners["test"].length).toBe(2);
+    var listeners = leaflet.getListeners();
+
+    expect(listeners["test"]).toBeDefined();
+    expect(listeners["test"].length).toBe(2);
 
     leaflet.off("test");
 
-    expect(leaflet._listeners["test"]).toBeUndefined();
+    expect(listeners["test"]).toBeUndefined();
   });
 
   it("should link a child to a parent", function() {
@@ -75,11 +78,11 @@ describe("Leaflet", function() {
 
     child.linkParent(parent);
 
-    expect(child._parentLinks.length).toBe(1);
-    expect(child._parentLinks[0]).toBe(parent);
+    expect(child.getParentLinks().length).toBe(1);
+    expect(child.getParentLinks()[0]).toBe(parent);
 
-    expect(child._parentLinks.length).toBe(1);
-    expect(parent._childLinks[0]).toBe(child);
+    expect(child.getParentLinks().length).toBe(1);
+    expect(parent.getChildLinks()[0]).toBe(child);
   });
 
   it("should link a parent to a child", function() {
@@ -88,11 +91,11 @@ describe("Leaflet", function() {
 
     parent.linkChild(child);
 
-    expect(child._parentLinks.length).toBe(1);
-    expect(child._parentLinks[0]).toBe(parent);
+    expect(child.getParentLinks().length).toBe(1);
+    expect(child.getParentLinks()[0]).toBe(parent);
 
-    expect(child._parentLinks.length).toBe(1);
-    expect(parent._childLinks[0]).toBe(child);
+    expect(child.getParentLinks().length).toBe(1);
+    expect(parent.getChildLinks()[0]).toBe(child);
   });
 
   it("should emit events up through a heirarchy chain", function() {
@@ -214,15 +217,15 @@ describe("Leaflet", function() {
 
     child.linkParent(parent);
 
-    expect(child._parentLinks[0]).toBe(parent);
-    expect(parent._childLinks[0]).toBe(child);
+    expect(child.getParentLinks()[0]).toBe(parent);
+    expect(parent.getChildLinks()[0]).toBe(child);
 
     child.unlinkParent(parent);
 
-    expect(child._parentLinks[0]).toBeUndefined();
-    expect(parent._childLinks[0]).toBeUndefined();
-    expect(child._parentLinks.length).toBe(0);
-    expect(parent._childLinks.length).toBe(0);
+    expect(child.getParentLinks()[0]).toBeUndefined();
+    expect(parent.getChildLinks()[0]).toBeUndefined();
+    expect(child.getParentLinks().length).toBe(0);
+    expect(parent.getChildLinks().length).toBe(0);
   });
 
   it("should unlink a child", function() {
@@ -231,15 +234,15 @@ describe("Leaflet", function() {
 
     parent.linkChild(child);
 
-    expect(child._parentLinks[0]).toBe(parent);
-    expect(parent._childLinks[0]).toBe(child);
+    expect(child.getParentLinks()[0]).toBe(parent);
+    expect(parent.getChildLinks()[0]).toBe(child);
 
     parent.unlinkChild(child);
 
-    expect(child._parentLinks[0]).toBeUndefined();
-    expect(parent._childLinks[0]).toBeUndefined();
-    expect(child._parentLinks.length).toBe(0);
-    expect(parent._childLinks.length).toBe(0);
+    expect(child.getParentLinks()[0]).toBeUndefined();
+    expect(parent.getChildLinks()[0]).toBeUndefined();
+    expect(child.getParentLinks().length).toBe(0);
+    expect(parent.getChildLinks().length).toBe(0);
   });
 
   it("should transform the values from child to parent", function() {
