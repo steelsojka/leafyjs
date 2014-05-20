@@ -58,20 +58,7 @@
     };
 
     this.emit = function(eventName) {
-      var event = eventName instanceof LeafletEvent ? eventName : new LeafletEvent(eventName, FLAT);
-      var args = toArray(arguments);
-
-      eventName = event.getEventName();
-
-      args[0] = event;
-
-      if (!listeners[eventName]) {
-        return;
-      }
-
-      for (var i = 0, len = listeners[eventName].length; i < len; i++) {
-        listeners[eventName][i].apply(this, args);
-      }
+      emit(FLAT, [this], toArray(arguments));
     };
 
     this.emitUp = function() {
@@ -105,12 +92,30 @@
       pull(leaflet.getChildLinks(), this);
       return leaflet;
     };
+
+    this.destroy = function() {
+      for (var i = 0, len = parentLinks.length; i < len; i++) {
+        this.unlinkParent(parentLinks[i]);
+      }
+
+      for (i = 0, len = childLinks.length; i < len; i++) {
+        this.unlinkChild(childLinks[i]);
+      }
+
+      forOwn(listeners, function(val, key) {
+        delete listeners[key];
+      });
+    };
   };
 
   // Static methods
   Leaflet.mixin = function(obj) {
     extend(obj, new Leaflet());
   };
+
+  Leaflet.UP = UP;
+  Leaflet.DOWN = DOWN;
+  Leaflet.FLAT = FLAT;
 
   var LeafletEvent = function(eventName, direction) {
     var stopProp = false;
@@ -164,7 +169,7 @@
     }
 
     // If propagation was not stopped, it's safe to move to the next level
-    if (!event.isPropagationStopped()) {
+    if (!event.isPropagationStopped() && type !== FLAT) {
       // If the values get transformed we create a new set of arguments.
       // Transformed arguments only get passed to the next level and not siblings
       args = [event].concat(event.getValues());
@@ -192,13 +197,19 @@
   }
 
   function extend(obj1, obj2) {
-    for (var key in obj2) {
-      if (obj2.hasOwnProperty(key)) {
-        obj1[key] = obj2[key];
-      }
-    }
+    forOwn(obj2, function(val, key) {
+      obj1[key] = val;
+    });
 
     return obj1;
+  }
+
+  function forOwn(obj, fn) {
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        fn(obj[key], key);
+      }
+    }
   }
 
   function toArray(collection, start) {

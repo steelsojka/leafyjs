@@ -268,4 +268,24 @@ describe("Leaflet", function() {
 
     child.emitUp("test", 5, "hello");
   });
+
+  it("should destroy all links and listeners", function() {
+    var parent = new Leaflet();
+    var child = new Leaflet();
+    var grandparent = new Leaflet();
+
+    grandparent.linkChild(parent).linkChild(child);
+
+    parent.on("test", function() {});
+
+    expect(parent.getListeners()["test"].length).toBe(1);
+    expect(parent.getChildLinks().length).toBe(1);
+    expect(parent.getParentLinks().length).toBe(1);
+
+    parent.destroy();
+
+    expect(parent.getListeners()["test"]).toBeUndefined();
+    expect(parent.getChildLinks().length).toBe(0);
+    expect(parent.getParentLinks().length).toBe(0);
+  });
 });
