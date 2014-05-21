@@ -288,4 +288,16 @@ describe("Leaflet", function() {
     expect(parent.getChildLinks().length).toBe(0);
     expect(parent.getParentLinks().length).toBe(0);
   });
+
+  it("should bind an event only once", function() {
+    var leaflet = new Leaflet();
+    var spy = jasmine.createSpy();
+
+    leaflet.once("test", spy);
+
+    leaflet.emit("test");
+    leaflet.emit("test");
+
+    expect(spy.calls.count()).toBe(1);
+  });
 });

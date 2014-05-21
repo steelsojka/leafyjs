@@ -41,6 +41,15 @@
       });
     };
 
+    this.once = function(event, fn) {
+      var unbind = this.on(event, bind(this, function() {
+        fn.apply(this, arguments);
+        unbind();
+      }));
+
+      return unbind;
+    };
+
     this.off = function(event, fn) {
       if (!listeners[event]) {
         return;
