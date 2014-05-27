@@ -68,7 +68,7 @@
     };
 
     this.emit = function(eventName) {
-      emit(this, FLAT, [this], toArray(arguments));
+      emit(this, FLAT, [], toArray(arguments));
     };
 
     this.emitUp = function() {
@@ -171,6 +171,19 @@
     };
   };
 
+  function emitCollection(eventName, collection, args) {
+    for (var i = 0, len = collection.length; i < len; i++) {
+      var node = collection[i];
+      var listeners = node.getListeners();
+
+      if (listeners[eventName]) {
+        for (var y = 0, len2 = listeners[eventName].length; y < len2; y++) {
+          listeners[eventName][y].apply(node, args);
+        }
+      }
+    }
+  }
+
   function emit(target, type, collection, args) {
     var eventName = args[0];
     var event = eventName instanceof LeafletEvent ? eventName : new LeafletEvent(target, eventName, type);
@@ -182,16 +195,7 @@
 
     args[0] = event;
 
-    for (var i = 0, len = collection.length; i < len; i++) {
-      var node = collection[i];
-      var listeners = node.getListeners();
-
-      if (listeners[eventName]) {
-        for (var y = 0, len2 = listeners[eventName].length; y < len2; y++) {
-          listeners[eventName][y].apply(node, args);
-        }
-      }
-    }
+    emitCollection(eventName, [target], args); // Emit on the current target first
 
     // If propagation was not stopped, it's safe to move to the next level
     if (!event.isPropagationStopped() && (type === UP || type === DOWN)) {
@@ -199,9 +203,11 @@
       // Transformed arguments only get passed to the next level and not siblings
       args = [event].concat(event.getValues());
 
-      for (i = 0, len = collection.length; i < len; i++) {
+      for (var i = 0, len = collection.length; i < len; i++) {
         collection[i][method].apply(collection[i], args);
       }
+    } else if (type === SIBLING) {
+      emitCollection(eventName, collection, args);
     }
 
     return event;

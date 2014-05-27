@@ -116,10 +116,11 @@ describe("Leaflet", function() {
 
     grandparent.on("test", spy);
     parent.on("test", spy);
+    child.on("test", spy);
 
     child.emitUp("test");
 
-    expect(spy.calls.count()).toBe(2);
+    expect(spy.calls.count()).toBe(3);
   });
 
   it("should emit events up through a heirarchy chain stopping propagation in the middle", function() {
@@ -167,10 +168,11 @@ describe("Leaflet", function() {
 
     child.on("test", spy);
     parent.on("test", spy);
+    grandparent.on("test", spy);
 
     grandparent.emitDown("test");
 
-    expect(spy.calls.count()).toBe(2);
+    expect(spy.calls.count()).toBe(3);
   });
 
   it("should emit events down through a heirarchy chain stopping propagation in the middle", function() {
@@ -327,6 +329,8 @@ describe("Leaflet", function() {
 
     root.emitSibling("test");
 
+    expect(rootSpy).toHaveBeenCalled();
+    expect(rootSpy.calls.count()).toBe(1);
     expect(siblingSpy1).toHaveBeenCalled();
     expect(siblingSpy1.calls.count()).toBe(1);
     expect(siblingSpy2).toHaveBeenCalled();
