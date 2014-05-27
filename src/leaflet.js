@@ -7,6 +7,7 @@
   var UP = "up";
   var DOWN = "down";
   var FLAT = "flat";
+  var SIBLING = "sibling";
 
   var methodTypes = {
     up: "emitUp",
@@ -67,15 +68,25 @@
     };
 
     this.emit = function(eventName) {
-      emit(FLAT, [this], toArray(arguments));
+      emit(this, FLAT, [this], toArray(arguments));
     };
 
     this.emitUp = function() {
-      emit(UP, parentLinks, toArray(arguments));
+      emit(this, UP, parentLinks, toArray(arguments));
     };
 
     this.emitDown = function() {
-      emit(DOWN, childLinks, toArray(arguments));
+      emit(this, DOWN, childLinks, toArray(arguments));
+    };
+
+    this.emitSibling = function() {
+      var collection = [];
+
+      for (var i = 0, len = parentLinks.length; i < len; i++) {
+        collection = collection.concat(pull(parentLinks[i].getChildLinks(), this, true));
+      }
+
+      emit(this, SIBLING, collection, toArray(arguments));
     };
 
     this.linkChild = function(leaflet) {
@@ -125,8 +136,9 @@
   Leaflet.UP = UP;
   Leaflet.DOWN = DOWN;
   Leaflet.FLAT = FLAT;
+  Leaflet.SIBLING = SIBLING;
 
-  var LeafletEvent = function(eventName, direction) {
+  var LeafletEvent = function(target, eventName, direction) {
     var stopProp = false;
     var values = [];
 
@@ -146,6 +158,10 @@
       return eventName;
     };
 
+    this.getTarget = function() {
+      return target;
+    };
+
     this.transformValues = function() {
       values = toArray(arguments);
     };
@@ -155,9 +171,9 @@
     };
   };
 
-  function emit(type, collection, args) {
+  function emit(target, type, collection, args) {
     var eventName = args[0];
-    var event = eventName instanceof LeafletEvent ? eventName : new LeafletEvent(eventName, type);
+    var event = eventName instanceof LeafletEvent ? eventName : new LeafletEvent(target, eventName, type);
     var method = methodTypes[type];
 
     eventName = event.getEventName();
@@ -178,7 +194,7 @@
     }
 
     // If propagation was not stopped, it's safe to move to the next level
-    if (!event.isPropagationStopped() && type !== FLAT) {
+    if (!event.isPropagationStopped() && (type === UP || type === DOWN)) {
       // If the values get transformed we create a new set of arguments.
       // Transformed arguments only get passed to the next level and not siblings
       args = [event].concat(event.getValues());
@@ -187,14 +203,20 @@
         collection[i][method].apply(collection[i], args);
       }
     }
+
+    return event;
   }
 
-  function pull(collection, item) {
+  function pull(collection, item, clone) {
+    collection = clone ? collection.slice(0) : collection;
+
     var index = indexOf(collection, item);
 
     if (index !== -1) {
       collection.splice(index, 1);
     }
+
+    return collection;
   }
 
   function bind(context, fn) {

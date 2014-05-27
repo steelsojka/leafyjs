@@ -300,4 +300,30 @@ describe("Leaflet", function() {
 
     expect(spy.calls.count()).toBe(1);
   });
+
+  it("should emit to all sibling nodes", function() {
+    var root = new Leaflet();
+    var sibling1 = new Leaflet();
+    var sibling2 = new Leaflet();
+    var parent1 = new Leaflet();
+    var parent2 = new Leaflet();
+
+    var rootSpy = jasmine.createSpy();
+    var siblingSpy1 = jasmine.createSpy();
+    var siblingSpy2 = jasmine.createSpy();
+
+    root.linkParent(parent1).linkChild(sibling1);
+    root.linkParent(parent2).linkChild(sibling2);
+
+    root.on("test", rootSpy);
+    sibling1.on("test", siblingSpy1);
+    sibling2.on("test", siblingSpy2);
+
+    root.emitSibling("test");
+
+    expect(siblingSpy1).toHaveBeenCalled();
+    expect(siblingSpy1.calls.count()).toBe(1);
+    expect(siblingSpy2).toHaveBeenCalled();
+    expect(siblingSpy2.calls.count()).toBe(1);
+  });
 });
