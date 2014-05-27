@@ -51,6 +51,12 @@ describe("Leaflet", function() {
     expect(listeners["test"]).toBeDefined();
     expect(listeners["test"].length).toBe(1);
 
+    // This should just return out
+    leaflet.off("avasda");
+
+    // This should not error
+    leaflet.off("test", function() {});
+
     leaflet.off("test", callback);
 
     expect(listeners["test"]).toBeUndefined();
@@ -325,5 +331,28 @@ describe("Leaflet", function() {
     expect(siblingSpy1.calls.count()).toBe(1);
     expect(siblingSpy2).toHaveBeenCalled();
     expect(siblingSpy2.calls.count()).toBe(1);
+  });
+
+  it("should get the target of the event", function() {
+    var leaflet = new Leaflet();
+
+    leaflet.on("test", function(event) {
+      expect(event.getTarget()).toBe(leaflet);
+    });
+
+    leaflet.emit("test");
+  });
+
+  it("should return the direction of the event", function() {
+    var leaflet = new Leaflet();
+    var parent = new Leaflet();
+
+    leaflet.linkParent(parent);
+
+    leaflet.on("test", function(event) {
+      expect(event.getDirection()).toBe(Leaflet.DOWN);
+    });
+
+    parent.emitDown("test");
   });
 });
