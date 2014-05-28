@@ -94,6 +94,11 @@ API
   * **Returns** `Leafy`: The leafy instance passed in.
 
 * `destroy()`: Removes all links and listeners. This should be called when removing the leafy. Not doing so can cause memory leaks.
+  If a child node has only one parent that is the destroyed node, that child's `destroy` method will be invoked also, otherwise the
+  child will be unlinked.
+
+* `isDestroyed()`: Returns whether the node is destroyed.
+  * **Returns** `Boolean`: Whether the node is destroyed.
 
 ####Static Methods:
 * `mixin(obj)`: Mixes a leafy instance into any object.

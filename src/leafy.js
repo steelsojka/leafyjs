@@ -19,6 +19,11 @@
     var childLinks = [];
     var parentLinks = [];
     var listeners = {};
+    var destroyed = false;
+
+    this.isDestroyed = function() {
+      return destroyed;
+    };
 
     this.getListeners = function() {
       return listeners;
@@ -113,18 +118,27 @@
       return leafy;
     };
 
-    this.destroy = function() {
+    this.destroy = function(key) {
       for (var i = 0, len = parentLinks.length; i < len; i++) {
         this.unlinkParent(parentLinks[i]);
       }
 
       for (i = 0, len = childLinks.length; i < len; i++) {
-        this.unlinkChild(childLinks[i]);
+        var childLink = childLinks[i];
+        var _parentLinks = childLink.getParentLinks();
+
+        if (_parentLinks.length === 1 && _parentLinks[0] === this) {
+          childLink.destroy();
+        } else {
+          this.unlinkChild(childLink);
+        }
       }
 
       forOwn(listeners, function(val, key) {
         delete listeners[key];
       });
+
+      destroyed = true;
     };
   };
 

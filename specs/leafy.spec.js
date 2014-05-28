@@ -299,6 +299,42 @@ describe("Leafy", function() {
     expect(parent.getParentLinks().length).toBe(0);
   });
 
+  it("should destroy all child nodes if the destroyed node is the only parent", function() {
+    var parent = new Leafy();
+    var child = new Leafy();
+    var grandparent = new Leafy();
+
+    grandparent.linkChild(parent).linkChild(child);
+
+    expect(grandparent.isDestroyed()).toBe(false);
+    expect(parent.isDestroyed()).toBe(false);
+    expect(child.isDestroyed()).toBe(false);
+
+    grandparent.destroy();
+
+    expect(grandparent.isDestroyed()).toBe(true);
+    expect(parent.isDestroyed()).toBe(true);
+    expect(child.isDestroyed()).toBe(true);
+  });
+
+  it("should not destroy the child node if it has multiple parents", function() {
+    var parent = new Leafy();
+    var parent2 = new Leafy();
+    var child = new Leafy();
+
+    parent.linkChild(child).linkParent(parent2);
+
+    expect(parent.isDestroyed()).toBe(false);
+    expect(parent2.isDestroyed()).toBe(false);
+    expect(child.isDestroyed()).toBe(false);
+
+    parent.destroy();
+
+    expect(parent.isDestroyed()).toBe(true);
+    expect(parent2.isDestroyed()).toBe(false);
+    expect(child.isDestroyed()).toBe(false);
+  });
+
   it("should bind an event only once", function() {
     var leafy = new Leafy();
     var spy = jasmine.createSpy();
