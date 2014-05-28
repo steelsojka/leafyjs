@@ -5,8 +5,10 @@ describe("Leaflet", function() {
 
   it("should create a new instance", function() {
     var leaflet = new Leaflet();
+    var leaflet2 = Leaflet.create();
 
     expect(leaflet instanceof Leaflet).toBe(true);
+    expect(leaflet2 instanceof Leaflet).toBe(true);
   });
 
   it("should bind an event", function() {

@@ -67,7 +67,7 @@
       }
     };
 
-    this.emit = function(eventName) {
+    this.emit = function() {
       emit(this, FLAT, [], toArray(arguments));
     };
 
@@ -131,6 +131,10 @@
   // Static methods
   Leaflet.mixin = function(obj) {
     extend(obj, new Leaflet());
+  };
+
+  Leaflet.create = function() {
+    return new Leaflet();
   };
 
   Leaflet.UP = UP;
