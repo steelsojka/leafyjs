@@ -14,7 +14,7 @@
     down: "emitDown"
   };
 
-  var Leaflet = function() {
+  var Leafy = function() {
     // These variables have to be "private" to avoid having circular references.
     var childLinks = [];
     var parentLinks = [];
@@ -89,28 +89,28 @@
       emit(this, SIBLING, collection, toArray(arguments));
     };
 
-    this.linkChild = function(leaflet) {
-      childLinks.push(leaflet);
-      leaflet.getParentLinks().push(this);
-      return leaflet;
+    this.linkChild = function(leafy) {
+      childLinks.push(leafy);
+      leafy.getParentLinks().push(this);
+      return leafy;
     };
 
-    this.linkParent = function(leaflet) {
-      parentLinks.push(leaflet);
-      leaflet.getChildLinks().push(this);
-      return leaflet;
+    this.linkParent = function(leafy) {
+      parentLinks.push(leafy);
+      leafy.getChildLinks().push(this);
+      return leafy;
     };
 
-    this.unlinkChild = function(leaflet) {
-      pull(childLinks, leaflet);
-      pull(leaflet.getParentLinks(), this);
-      return leaflet;
+    this.unlinkChild = function(leafy) {
+      pull(childLinks, leafy);
+      pull(leafy.getParentLinks(), this);
+      return leafy;
     };
 
-    this.unlinkParent = function(leaflet) {
-      pull(parentLinks, leaflet);
-      pull(leaflet.getChildLinks(), this);
-      return leaflet;
+    this.unlinkParent = function(leafy) {
+      pull(parentLinks, leafy);
+      pull(leafy.getChildLinks(), this);
+      return leafy;
     };
 
     this.destroy = function() {
@@ -129,20 +129,20 @@
   };
 
   // Static methods
-  Leaflet.mixin = function(obj) {
-    extend(obj, new Leaflet());
+  Leafy.mixin = function(obj) {
+    extend(obj, new Leafy());
   };
 
-  Leaflet.create = function() {
-    return new Leaflet();
+  Leafy.create = function() {
+    return new Leafy();
   };
 
-  Leaflet.UP = UP;
-  Leaflet.DOWN = DOWN;
-  Leaflet.FLAT = FLAT;
-  Leaflet.SIBLING = SIBLING;
+  Leafy.UP = UP;
+  Leafy.DOWN = DOWN;
+  Leafy.FLAT = FLAT;
+  Leafy.SIBLING = SIBLING;
 
-  var LeafletEvent = function(target, eventName, direction) {
+  var LeafyEvent = function(target, eventName, direction) {
     var stopProp = false;
     var values = [];
 
@@ -190,7 +190,7 @@
 
   function emit(target, type, collection, args) {
     var eventName = args[0];
-    var event = eventName instanceof LeafletEvent ? eventName : new LeafletEvent(target, eventName, type);
+    var event = eventName instanceof LeafyEvent ? eventName : new LeafyEvent(target, eventName, type);
     var method = methodTypes[type];
 
     eventName = event.getEventName();
@@ -267,5 +267,5 @@
     return -1;
   }
 
-  exports.Leaflet = Leaflet;
+  exports.Leafy = Leafy;
 }(this));

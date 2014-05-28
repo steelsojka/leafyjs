@@ -1,5 +1,5 @@
 {
-  "name": "leaflet",
+  "name": "leafyjs",
   "version": "0.1.0",
   "description": "An event emitter with hierarchies",
   "scripts": {
@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/steelsojka/leaflet.git"
+    "url": "https://github.com/steelsojka/leafy.git"
   },
   "keywords": [
     "event",
@@ -18,9 +18,9 @@
   "author": "Steven Sojka",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/steelsojka/leaflet/issues"
+    "url": "https://github.com/steelsojka/leafy/issues"
   },
-  "homepage": "https://github.com/steelsojka/leaflet",
+  "homepage": "https://github.com/steelsojka/leafy",
   "devDependencies": {
     "karma": "~0.12.9",
     "gulp-karma": "0.0.4",

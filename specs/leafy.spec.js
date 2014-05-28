@@ -1,43 +1,43 @@
-describe("Leaflet", function() {
+describe("Leafy", function() {
 
   beforeEach(function() {
   });
 
   it("should create a new instance", function() {
-    var leaflet = new Leaflet();
-    var leaflet2 = Leaflet.create();
+    var leafy = new Leafy();
+    var leafy2 = Leafy.create();
 
-    expect(leaflet instanceof Leaflet).toBe(true);
-    expect(leaflet2 instanceof Leaflet).toBe(true);
+    expect(leafy instanceof Leafy).toBe(true);
+    expect(leafy2 instanceof Leafy).toBe(true);
   });
 
   it("should bind an event", function() {
-    var leaflet = new Leaflet();
+    var leafy = new Leafy();
 
-    leaflet.on("test", function() {});
+    leafy.on("test", function() {});
 
-    var listeners = leaflet.getListeners();
+    var listeners = leafy.getListeners();
 
     expect(listeners["test"]).toBeDefined();
     expect(listeners["test"].length).toBe(1);
   });
 
   it("should emit an event", function() {
-    var leaflet = new Leaflet();
+    var leafy = new Leafy();
     var spy = jasmine.createSpy();
 
-    leaflet.on("test", spy); 
+    leafy.on("test", spy); 
 
-    leaflet.emit("test");
+    leafy.emit("test");
     
     expect(spy).toHaveBeenCalled();
   });
 
   it("should unbind an event", function() {
-    var leaflet = new Leaflet();
+    var leafy = new Leafy();
 
-    var unbind = leaflet.on("test", function() {});
-    var listeners = leaflet.getListeners();
+    var unbind = leafy.on("test", function() {});
+    var listeners = leafy.getListeners();
 
     expect(listeners["test"]).toBeDefined();
     expect(listeners["test"].length).toBe(1);
@@ -48,41 +48,41 @@ describe("Leaflet", function() {
 
     var callback = function() {};
 
-    leaflet.on("test", callback);
+    leafy.on("test", callback);
 
     expect(listeners["test"]).toBeDefined();
     expect(listeners["test"].length).toBe(1);
 
     // This should just return out
-    leaflet.off("avasda");
+    leafy.off("avasda");
 
     // This should not error
-    leaflet.off("test", function() {});
+    leafy.off("test", function() {});
 
-    leaflet.off("test", callback);
+    leafy.off("test", callback);
 
     expect(listeners["test"]).toBeUndefined();
   });
 
   it("should unbind all event listeners", function() {
-    var leaflet = new Leaflet();
+    var leafy = new Leafy();
 
-    leaflet.on("test", function() {});
-    leaflet.on("test", function() {});
+    leafy.on("test", function() {});
+    leafy.on("test", function() {});
 
-    var listeners = leaflet.getListeners();
+    var listeners = leafy.getListeners();
 
     expect(listeners["test"]).toBeDefined();
     expect(listeners["test"].length).toBe(2);
 
-    leaflet.off("test");
+    leafy.off("test");
 
     expect(listeners["test"]).toBeUndefined();
   });
 
   it("should link a child to a parent", function() {
-    var child = new Leaflet();
-    var parent = new Leaflet();
+    var child = new Leafy();
+    var parent = new Leafy();
 
     child.linkParent(parent);
 
@@ -94,8 +94,8 @@ describe("Leaflet", function() {
   });
 
   it("should link a parent to a child", function() {
-    var child = new Leaflet();
-    var parent = new Leaflet();
+    var child = new Leafy();
+    var parent = new Leafy();
 
     parent.linkChild(child);
 
@@ -107,9 +107,9 @@ describe("Leaflet", function() {
   });
 
   it("should emit events up through a heirarchy chain", function() {
-    var grandparent = new Leaflet();
-    var parent = new Leaflet();
-    var child = new Leaflet();
+    var grandparent = new Leafy();
+    var parent = new Leafy();
+    var child = new Leafy();
 
     var spy = jasmine.createSpy();
 
@@ -126,9 +126,9 @@ describe("Leaflet", function() {
   });
 
   it("should emit events up through a heirarchy chain stopping propagation in the middle", function() {
-    var grandparent = new Leaflet();
-    var parent = new Leaflet();
-    var child = new Leaflet();
+    var grandparent = new Leafy();
+    var parent = new Leafy();
+    var child = new Leafy();
 
     var parentspy = jasmine.createSpy();
     var grandparentspy = jasmine.createSpy();
@@ -149,19 +149,19 @@ describe("Leaflet", function() {
     expect(grandparentspy).not.toHaveBeenCalled();
   });
 
-  it("should chain link leaflets", function() {
-    var grandparent = new Leaflet();
-    var parent = new Leaflet();
-    var child = new Leaflet();
+  it("should chain link leafys", function() {
+    var grandparent = new Leafy();
+    var parent = new Leafy();
+    var child = new Leafy();
 
     expect(grandparent.linkChild(parent)).toBe(parent)
     expect(child.linkParent(parent)).toBe(parent)
   });
 
   it("should emit events down through a heirarchy chain", function() {
-    var grandparent = new Leaflet();
-    var parent = new Leaflet();
-    var child = new Leaflet();
+    var grandparent = new Leafy();
+    var parent = new Leafy();
+    var child = new Leafy();
 
     var spy = jasmine.createSpy();
 
@@ -178,9 +178,9 @@ describe("Leaflet", function() {
   });
 
   it("should emit events down through a heirarchy chain stopping propagation in the middle", function() {
-    var grandparent = new Leaflet();
-    var parent = new Leaflet();
-    var child = new Leaflet();
+    var grandparent = new Leafy();
+    var parent = new Leafy();
+    var child = new Leafy();
 
     var parentspy = jasmine.createSpy();
     var childspy = jasmine.createSpy();
@@ -202,28 +202,28 @@ describe("Leaflet", function() {
   });
 
   it("should mixin the event emitter", function() {
-    var leaflet1 = {};
-    var leaflet2 = {};
+    var leafy1 = {};
+    var leafy2 = {};
 
     var spy1 = jasmine.createSpy();
     var spy2 = jasmine.createSpy();
 
-    Leaflet.mixin(leaflet1);
-    Leaflet.mixin(leaflet2);
+    Leafy.mixin(leafy1);
+    Leafy.mixin(leafy2);
 
-    leaflet1.on("test", spy1);
-    leaflet2.on("test", spy2);
+    leafy1.on("test", spy1);
+    leafy2.on("test", spy2);
 
-    leaflet1.emit("test");
-    leaflet2.emit("test");
+    leafy1.emit("test");
+    leafy2.emit("test");
 
     expect(spy1.calls.count()).toBe(1);
     expect(spy2.calls.count()).toBe(1);
   });
 
   it("should unlink a parent", function() {
-    var parent = new Leaflet();
-    var child = new Leaflet();
+    var parent = new Leafy();
+    var child = new Leafy();
 
     child.linkParent(parent);
 
@@ -239,8 +239,8 @@ describe("Leaflet", function() {
   });
 
   it("should unlink a child", function() {
-    var parent = new Leaflet();
-    var child = new Leaflet();
+    var parent = new Leafy();
+    var child = new Leafy();
 
     parent.linkChild(child);
 
@@ -256,9 +256,9 @@ describe("Leaflet", function() {
   });
 
   it("should transform the values from child to parent", function() {
-    var parent = new Leaflet();
-    var child = new Leaflet();
-    var grandparent = new Leaflet();
+    var parent = new Leafy();
+    var child = new Leafy();
+    var grandparent = new Leafy();
 
     grandparent.linkChild(parent).linkChild(child);
 
@@ -280,9 +280,9 @@ describe("Leaflet", function() {
   });
 
   it("should destroy all links and listeners", function() {
-    var parent = new Leaflet();
-    var child = new Leaflet();
-    var grandparent = new Leaflet();
+    var parent = new Leafy();
+    var child = new Leafy();
+    var grandparent = new Leafy();
 
     grandparent.linkChild(parent).linkChild(child);
 
@@ -300,23 +300,23 @@ describe("Leaflet", function() {
   });
 
   it("should bind an event only once", function() {
-    var leaflet = new Leaflet();
+    var leafy = new Leafy();
     var spy = jasmine.createSpy();
 
-    leaflet.once("test", spy);
+    leafy.once("test", spy);
 
-    leaflet.emit("test");
-    leaflet.emit("test");
+    leafy.emit("test");
+    leafy.emit("test");
 
     expect(spy.calls.count()).toBe(1);
   });
 
   it("should emit to all sibling nodes", function() {
-    var root = new Leaflet();
-    var sibling1 = new Leaflet();
-    var sibling2 = new Leaflet();
-    var parent1 = new Leaflet();
-    var parent2 = new Leaflet();
+    var root = new Leafy();
+    var sibling1 = new Leafy();
+    var sibling2 = new Leafy();
+    var parent1 = new Leafy();
+    var parent2 = new Leafy();
 
     var rootSpy = jasmine.createSpy();
     var siblingSpy1 = jasmine.createSpy();
@@ -340,23 +340,23 @@ describe("Leaflet", function() {
   });
 
   it("should get the target of the event", function() {
-    var leaflet = new Leaflet();
+    var leafy = new Leafy();
 
-    leaflet.on("test", function(event) {
-      expect(event.getTarget()).toBe(leaflet);
+    leafy.on("test", function(event) {
+      expect(event.getTarget()).toBe(leafy);
     });
 
-    leaflet.emit("test");
+    leafy.emit("test");
   });
 
   it("should return the direction of the event", function() {
-    var leaflet = new Leaflet();
-    var parent = new Leaflet();
+    var leafy = new Leafy();
+    var parent = new Leafy();
 
-    leaflet.linkParent(parent);
+    leafy.linkParent(parent);
 
-    leaflet.on("test", function(event) {
-      expect(event.getDirection()).toBe(Leaflet.DOWN);
+    leafy.on("test", function(event) {
+      expect(event.getDirection()).toBe(Leafy.DOWN);
     });
 
     parent.emitDown("test");

@@ -1,10 +1,21 @@
 Leaflet.js
 =================
 
-[![Build Status](https://travis-ci.org/steelsojka/leaflet.svg?branch=master)](https://travis-ci.org/steelsojka/leaflet)
-[![Coverage Status](https://coveralls.io/repos/steelsojka/leaflet/badge.png)](https://coveralls.io/r/steelsojka/leaflet)
+[![Build Status](https://travis-ci.org/steelsojka/leafyjs.svg?branch=master)](https://travis-ci.org/steelsojka/leafyjs)
+[![Coverage Status](https://coveralls.io/repos/steelsojka/leafyjs/badge.png)](https://coveralls.io/r/steelsojka/leafyjs)
 
 An event emitter library with chainable hierarchies.
+
+Install
+-------
+* Browser:
+```html
+<script type="text/javascript" src="leafy.min.js"></script>
+```
+* Node:
+```
+npm install leafyjs
+```
 
 Instantiation
 -------------

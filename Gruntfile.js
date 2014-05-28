@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 
 	var buildHeader = [
 		"/**",
-		" * <%= pkg.name %>.js v<%= pkg.version %> by <%= pkg.author %>",
+		" * leafy.js v<%= pkg.version %> by <%= pkg.author %>",
 		" * <%= pkg.repository.url %>",
 		" * License: <%= pkg.license %>",
 		" */"
@@ -20,11 +20,11 @@ module.exports = function(grunt) {
 			options: {
 				banner: buildHeader,
 				sourceMap: true,
-				sourceMapName: "build/<%= pkg.name %>.map"
+				sourceMapName: "build/leafy.map"
 			},
 			dist: {
 				files: {
-					'build/<%= pkg.name %>.min.js': ["src/*.js"]
+					'build/leafy.min.js': ["src/*.js"]
 				}
 			}
 		},
