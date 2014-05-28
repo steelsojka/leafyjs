@@ -1,13 +1,13 @@
 {
   "name": "leafyjs",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "An event emitter with hierarchies",
   "scripts": {
     "test": "grunt test"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/steelsojka/leafy.git"
+    "url": "https://github.com/steelsojka/leafyjs.git"
   },
   "keywords": [
     "event",
@@ -18,9 +18,9 @@
   "author": "Steven Sojka",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/steelsojka/leafy/issues"
+    "url": "https://github.com/steelsojka/leafyjs/issues"
   },
-  "homepage": "https://github.com/steelsojka/leafy",
+  "homepage": "https://github.com/steelsojka/leafyjs",
   "devDependencies": {
     "karma": "~0.12.9",
     "gulp-karma": "0.0.4",
