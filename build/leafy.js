@@ -1,5 +1,5 @@
 /**
- * leafy.js v0.1.4 by Steven Sojka
+ * leafy.js v0.1.5 by Steven Sojka
  * https://github.com/steelsojka/leafyjs.git
  * License: MIT
  */
@@ -297,5 +297,9 @@
     };
   }
 
-  exports.Leafy = Leafy;
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = Leafy;
+  } else {
+    exports.Leafy = Leafy;
+  }
 }(this));

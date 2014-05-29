@@ -292,5 +292,9 @@
     };
   }
 
-  exports.Leafy = Leafy;
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = Leafy;
+  } else {
+    exports.Leafy = Leafy;
+  }
 }(this));
