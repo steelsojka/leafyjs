@@ -335,6 +335,14 @@ describe("Leafy", function() {
     expect(child.isDestroyed()).toBe(false);
   });
 
+  it("should throw an error when calling destructable method on a destroyed node", function() {
+    var child = new Leafy();
+
+    child.destroy();
+
+    expect(child.on).toThrow();
+  });
+
   it("should bind an event only once", function() {
     var leafy = new Leafy();
     var spy = jasmine.createSpy();

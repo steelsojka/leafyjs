@@ -29,6 +29,15 @@ module.exports = function(grunt) {
 			}
 		},
     clean: ["build"],
+    concat: {
+      options: {
+        banner: buildHeader + "\n"
+      },
+      dist: {
+        src: ["src/leafy.js"],
+        dest: "build/leafy.js"
+      }
+    },
 		karma: {
       angular: {
         configFile: "karma.conf.js"
@@ -53,12 +62,14 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks("grunt-contrib-jshint");
 	grunt.loadNpmTasks("grunt-contrib-uglify");
 	grunt.loadNpmTasks("grunt-contrib-clean");
+	grunt.loadNpmTasks("grunt-contrib-concat");
 	grunt.loadNpmTasks("grunt-karma");
 
   grunt.registerTask("test", ["jshint", "karma", "coveralls"]);
 
   grunt.registerTask("build", [
     "clean",
+    "concat",
     "uglify"
   ]);
 

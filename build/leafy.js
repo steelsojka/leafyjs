@@ -1,3 +1,8 @@
+/**
+ * leafy.js v0.1.4 by Steven Sojka
+ * https://github.com/steelsojka/leafyjs.git
+ * License: MIT
+ */
 (function(exports) {
   "use strict";
 
