@@ -1,13 +1,10 @@
 /**
- * leafy.js v0.1.5 by Steven Sojka
+ * leafy.js v0.1.6 by Steven Sojka
  * https://github.com/steelsojka/leafyjs.git
  * License: MIT
  */
 (function(exports) {
   "use strict";
-
-  var arrayProto = Array.prototype;
-  var slice = arrayProto.slice;
 
   var UP = "up";
   var DOWN = "down";
@@ -42,7 +39,7 @@
       return childLinks;
     };
 
-    this.on = destructable(this, function(event, callback) {
+    this.on = destroyable(this, function(event, callback) {
       listeners[event] = listeners[event] || [];
 
       listeners[event].push(callback);
@@ -52,7 +49,7 @@
       });
     });
 
-    this.once = destructable(this, function(event, fn) {
+    this.once = destroyable(this, function(event, fn) {
       var unbind = this.on(event, bind(this, function() {
         fn.apply(this, arguments);
         unbind();
@@ -61,7 +58,7 @@
       return unbind;
     });
 
-    this.off = destructable(this, function(event, fn) {
+    this.off = destroyable(this, function(event, fn) {
       if (!listeners[event]) {
         return;
       }
@@ -77,19 +74,19 @@
       }
     });
 
-    this.emit = destructable(this, function() {
+    this.emit = destroyable(this, function() {
       emit(this, FLAT, [], toArray(arguments));
     });
 
-    this.emitUp = destructable(this, function() {
+    this.emitUp = destroyable(this, function() {
       emit(this, UP, parentLinks, toArray(arguments));
     });
 
-    this.emitDown = destructable(this, function() {
+    this.emitDown = destroyable(this, function() {
       emit(this, DOWN, childLinks, toArray(arguments));
     });
 
-    this.emitSibling = destructable(this, function() {
+    this.emitSibling = destroyable(this, function() {
       var collection = [];
 
       for (var i = 0, len = parentLinks.length; i < len; i++) {
@@ -99,31 +96,31 @@
       emit(this, SIBLING, collection, toArray(arguments));
     });
 
-    this.linkChild = destructable(this, function(leafy) {
+    this.linkChild = destroyable(this, function(leafy) {
       childLinks.push(leafy);
       leafy.getParentLinks().push(this);
       return leafy;
     });
 
-    this.linkParent = destructable(this, function(leafy) {
+    this.linkParent = destroyable(this, function(leafy) {
       parentLinks.push(leafy);
       leafy.getChildLinks().push(this);
       return leafy;
     });
 
-    this.unlinkChild = destructable(this, function(leafy) {
+    this.unlinkChild = destroyable(this, function(leafy) {
       pull(childLinks, leafy);
       pull(leafy.getParentLinks(), this);
       return leafy;
     });
 
-    this.unlinkParent = destructable(this, function(leafy) {
+    this.unlinkParent = destroyable(this, function(leafy) {
       pull(parentLinks, leafy);
       pull(leafy.getChildLinks(), this);
       return leafy;
     });
 
-    this.destroy = destructable(this, function(key) {
+    this.destroy = destroyable(this, function(key) {
       for (var i = 0, len = parentLinks.length; i < len; i++) {
         this.unlinkParent(parentLinks[i]);
       }
@@ -223,6 +220,7 @@
 
     // If propagation was not stopped, it's safe to move to the next level
     if (!event.isPropagationStopped() && (type === UP || type === DOWN)) {
+
       // If the values get transformed we create a new set of arguments.
       // Transformed arguments only get passed to the next level and not siblings
       args = [event].concat(event.getValues());
@@ -274,7 +272,7 @@
   }
 
   function toArray(collection, start) {
-    return slice.call(collection, (start || 0));
+    return Array.prototype.slice.call(collection, (start || 0));
   }
 
   function indexOf(collection, element) {
@@ -287,11 +285,11 @@
     return -1;
   }
 
-  function destructable(leafy, fn) {
+  function destroyable(leafy, fn) {
     return function() {
       if (!leafy.isDestroyed()) {
         return fn.apply(leafy, arguments);
-      } 
+      }
 
       throw new Error("Leafy: Can not call method on destroyed node");
     };
